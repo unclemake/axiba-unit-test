@@ -1,4 +1,4 @@
-﻿# axiba-init 项目模版
+﻿# axiba-unit-test 单元测试
 
 需要 nodejs 6.2.0+
 ## 安装

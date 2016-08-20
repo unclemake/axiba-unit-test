@@ -1,41 +1,14 @@
 ﻿/// <reference path="../node_modules/axiba-util/src/index.ts" />
 import * as fs from 'fs';
-import { Util} from 'axiba-util';
+import {Util} from 'axiba-util';
 import * as readline from 'readline';
 import * as chalk from 'chalk';
+import {TestModule, TestCase, TestResult, TestInterface} from 'axiba-unit-test';
 
 let util = new Util();
 
-export interface TestResult {
-    passed: boolean,
-    txt?: string
-}
 
-
-export interface TestCase {
-    //用例标题
-    title: string,
-    //超时时间
-    overtime?: number
-    //测试用例函数
-    run: () => Promise<boolean> | boolean,
-
-    //测试结果
-    result?: TestResult
-}
-
-
-export interface TestModule {
-    //用例标题
-    title: string
-    //用例数组
-    caseArray: TestCase[]
-}
-
-
-
-export class Test {
-
+export class Test implements TestInterface {
 
     //测试用例数组
     caseArray: TestModule[] = []
