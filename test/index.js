@@ -31,9 +31,15 @@ let timeOutCase2 = {
         return true;
     }
 };
+let errorCase1 = {
+    title: '异常测试1',
+    run: () => {
+        throw '异常了';
+    }
+};
 let testModule = {
     title: '测试模块1',
-    caseArray: [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2]
+    caseArray: [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2, errorCase1]
 };
 test.default.push(testModule);
 test.default.run().then(() => test.default.creatDoc());

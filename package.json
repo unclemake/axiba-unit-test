@@ -1,27 +1,27 @@
 {
-  "name": "axiba-unit-test",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-jsdoc3": "^0.3.0",
-    "gulp-typescript": "^2.13.6"
-  },
-  "dependencies": {
-    "axiba-util": "^1.0.10"
-  },
-  "scripts": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/unclemake/axiba-init.git"
-  },
-  "author": "unclemake",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/unclemake/axiba-init/issues"
-  },
-  "homepage": "https://github.com/unclemake/axiba-init#readme"
+    "name": "axiba-unit-test",
+    "version": "1.0.1",
+    "description": "",
+    "main": "src/index.js",
+    "devDependencies": {
+        "gulp": "^3.9.1",
+        "gulp-jsdoc3": "^0.3.0",
+        "gulp-typescript": "^2.13.6"
+    },
+    "dependencies": {
+        "axiba-util": "^1.0.10"
+    },
+    "scripts": {
+        "test": "test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/unclemake/axiba-init.git"
+    },
+    "author": "unclemake",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/unclemake/axiba-init/issues"
+    },
+    "homepage": "https://github.com/unclemake/axiba-init#readme"
 }

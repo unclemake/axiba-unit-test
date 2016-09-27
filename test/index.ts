@@ -2,7 +2,6 @@
 import * as test from '../src/index'
 
 
-
 let testCase: test.TestCase = {
     title: '测试1',
     run: () => { return true; }
@@ -43,10 +42,19 @@ let timeOutCase2: test.TestCase = {
     }
 };
 
+let errorCase1: test.TestCase = {
+    title: '异常测试1',
+    run: () => {
+        throw '异常了';
+    }
+};
+
+
+
 
 let testModule: test.TestModule = {
     title: '测试模块1',
-    caseArray: [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2]
+    caseArray: [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2, errorCase1]
 };
 
 

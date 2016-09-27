@@ -79,22 +79,24 @@ class Test {
      */
     test(testCase) {
         return __awaiter(this, void 0, Promise, function* () {
-            try {
-                let bl = yield this.overtimeFun(() => testCase.run(), testCase.overtime);
-                if (typeof bl == 'boolean') {
-                    if (bl) {
-                        return { passed: true, txt: '成功' };
-                    }
-                    else {
-                        return { passed: false, txt: '失败' };
-                    }
+            let bl = yield this.overtimeFun(() => {
+                try {
+                    return testCase.run();
+                }
+                catch (e) {
+                    return e;
+                }
+            }, testCase.overtime);
+            if (typeof bl == 'boolean') {
+                if (bl) {
+                    return { passed: true, txt: '成功' };
                 }
                 else {
-                    return { passed: false, txt: String(bl) };
+                    return { passed: false, txt: '失败' };
                 }
             }
-            catch (e) {
-                return { passed: false, txt: e };
+            else {
+                return { passed: false, txt: String(bl) };
             }
         });
     }

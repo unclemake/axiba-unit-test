@@ -1,5 +1,4 @@
-﻿
-declare module "axiba-unit-test" {
+﻿declare module "axiba-unit-test" {
 
     export interface TestResult {
         passed: boolean,
@@ -34,7 +33,7 @@ declare module "axiba-unit-test" {
     export class TestInterface {
 
         //测试用例数组
-        caseArray: TestModule[] = []
+        caseArray: TestModule[]
 
         /**
          * 添加测试用例
@@ -45,7 +44,7 @@ declare module "axiba-unit-test" {
         /**
          * 运行所有测试用例
          */
-        run(): void
+        run(): Promise<any>
 
         /**
          * 单个测试是否通过
@@ -63,7 +62,7 @@ declare module "axiba-unit-test" {
          * 生成文档
          * @param path
          */
-        creatDoc(path: string)
+        creatDoc(path?: string)
 
     }
 

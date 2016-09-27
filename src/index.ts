@@ -1,9 +1,10 @@
 ﻿/// <reference path="../node_modules/axiba-util/src/index.ts" />
 import * as fs from 'fs';
-import {Util} from 'axiba-util';
+import { Util } from 'axiba-util';
 import * as readline from 'readline';
 import * as chalk from 'chalk';
-import {TestModule, TestCase, TestResult, TestInterface} from 'axiba-unit-test';
+import { TestModule, TestCase, TestResult, TestInterface } from 'axiba-unit-test';
+export { TestModule, TestCase, TestResult, TestInterface };
 
 let util = new Util();
 
@@ -84,22 +85,24 @@ export class Test implements TestInterface {
      * @param testCase
      */
     async test(testCase: TestCase): Promise<TestResult> {
-        try {
-            let bl = await this.overtimeFun(() => testCase.run(), testCase.overtime);
-
-            if (typeof bl == 'boolean') {
-                if (bl) {
-                    return { passed: true, txt: '成功' }
-                } else {
-                    return { passed: false, txt: '失败' }
-                }
-            } else {
-                return { passed: false, txt: String(bl) }
+        let bl = await this.overtimeFun(() => {
+            try {
+                return testCase.run();
+            } catch (e) {
+                return e;
             }
+        }, testCase.overtime);
 
-        } catch (e) {
-            return { passed: false, txt: e }
+        if (typeof bl == 'boolean') {
+            if (bl) {
+                return { passed: true, txt: '成功' }
+            } else {
+                return { passed: false, txt: '失败' }
+            }
+        } else {
+            return { passed: false, txt: String(bl) }
         }
+
     }
 
     /**
