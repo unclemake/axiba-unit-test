@@ -9,6 +9,55 @@ export { TestModule, TestCase, TestResult, TestInterface };
 let util = new Util();
 
 
+export class TestCaseList {
+
+    /** 测试方法*/
+    private testFun: (...arg) => any
+
+    /** 测试列表*/
+    private testList: {
+        arg: any[], run: (value) => boolean
+    }[] = []
+    /**
+     * 构造函数
+     * @param testFun 测试方法
+     */
+    constructor(testFun: (...arg) => any) {
+        this.testFun = testFun;
+    }
+
+    /**
+     * 添加测试数据
+     * @param arg 测试数据
+     * @param run 测试方法
+     */
+    add(arg: any[], run: (value) => boolean) {
+        this.testList.push({
+            arg: arg, run: run
+        });
+    }
+
+    /**
+     *  运行测试
+     */
+    run() {
+        let errorStr = '';
+
+        for (let i in this.testList) {
+            let value = this.testList[i];
+            try {
+                let str = this.testFun(...value.arg);
+                value.run(str) || (errorStr += i + ': ' + str + '\n\r');
+            } catch (e) {
+                errorStr += i + ': ' + e + '\n\r';
+            }
+        }
+
+        return errorStr;
+    }
+}
+
+
 export class Test implements TestInterface {
 
     //测试用例数组
@@ -98,6 +147,12 @@ export class Test implements TestInterface {
                 return { passed: true, txt: '成功' }
             } else {
                 return { passed: false, txt: '失败' }
+            }
+        } else if (typeof bl == 'string') {
+            if (bl === '') {
+                return { passed: true, txt: '成功' }
+            } else {
+                return { passed: false, txt: String(bl) }
             }
         } else {
             return { passed: false, txt: String(bl) }

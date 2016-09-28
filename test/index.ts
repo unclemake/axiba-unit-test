@@ -1,6 +1,29 @@
 ﻿
 import * as test from '../src/index'
 
+function testFunCase(value) {
+    return value + 'a';
+}
+
+let testList1 = [];
+testList1.push({
+    title: '测试1',
+    run: () => {
+        let listClass = new test.TestCaseList((value) => {
+            return testFunCase(value);
+        });
+
+        listClass.add(['3'], value => value === '3a');
+        return listClass.run();
+    }
+});
+
+let testModule1: test.TestModule = {
+    title: 'TestCaseList测试模块',
+    caseArray: testList1
+};
+test.default.push(testModule1);
+
 
 let testCase: test.TestCase = {
     title: '测试1',
@@ -50,14 +73,47 @@ let errorCase1: test.TestCase = {
 };
 
 
-
-
-let testModule: test.TestModule = {
-    title: '测试模块1',
-    caseArray: [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2, errorCase1]
+let stringCase1: test.TestCase = {
+    title: '返回字符串测试',
+    run: () => {
+        return '字符串了';
+    }
 };
 
 
+let stringCase2: test.TestCase = {
+    title: '返回字符串测试2',
+    run: () => {
+        return '';
+    }
+};
+
+let testList = [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2, errorCase1, stringCase1, stringCase2];
+
+let testModule: test.TestModule = {
+    title: 'test测试模块',
+    caseArray: testList
+};
 test.default.push(testModule);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 test.default.run().then(() => test.default.creatDoc());
 

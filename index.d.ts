@@ -1,5 +1,33 @@
 ﻿declare module "axiba-unit-test" {
 
+    export class TestCaseList {
+
+        /** 测试方法*/
+        private testFun: (...arg) => any
+
+        /** 测试列表*/
+        private testList: {
+            arg: any[], run: (value) => boolean
+        }[]
+        /**
+         * 构造函数
+         * @param testFun 测试方法
+         */
+        constructor(testFun: (...arg) => any)
+
+        /**
+         * 添加测试数据
+         * @param arg 测试数据
+         * @param run 测试方法
+         */
+        add(arg: any[], run: (value) => boolean)
+
+        /**
+         *  运行测试
+         */
+        run(): string
+    }
+
     export interface TestResult {
         passed: boolean,
         txt?: string
@@ -12,7 +40,7 @@
         //超时时间
         overtime?: number
         //测试用例函数
-        run: () => Promise<boolean> | boolean,
+        run: () => Promise<boolean> | boolean | Promise<string> | string,
 
         //测试结果
         result?: TestResult
