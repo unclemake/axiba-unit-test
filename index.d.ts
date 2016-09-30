@@ -1,73 +1,94 @@
 ﻿declare module "axiba-unit-test" {
 
-    export class TestCaseList {
+    /**
+   * 单个测试
+   */
+    export interface TestM<Y> {
+        argument: Y,
+        comparisonFunction: (arg) => string | boolean | Promise<string> | Promise<boolean>
+        overtime?: number
+        pass?: boolean,
+        error?: string
+    }
 
-        /** 测试方法*/
-        private testFun: (...arg) => any
+    /**
+     * 测试单元类
+     */
+    export class TestUnit<T, Y> {
 
-        /** 测试列表*/
-        private testList: {
-            arg: any[], run: (value) => boolean
-        }[]
         /**
          * 构造函数
-         * @param testFun 测试方法
+         * @param name 单元名
+         * @param testFunction 单元函数
          */
-        constructor(testFun: (...arg) => any)
+        constructor(name: string, testFunction: T)
+
+        /** 测试单元名 */
+        name: string
+
+        /** 测试函数 */
+        private testFunction: T
+
+        /** 测试参数数组 */
+        private testList: TestM<Y>[]
 
         /**
-         * 添加测试数据
-         * @param arg 测试数据
-         * @param run 测试方法
+         * 添加测试
+         * @param argument 参数
+         * @param comparisonFunction 测试函数返回值 对比函数
+         * @param overtime 超时时间
          */
-        add(arg: any[], run: (value) => boolean)
+        add(argument: Y, comparisonFunction: (arg) => string, overtime?: number): this
 
         /**
-         *  运行测试
-         */
-        run(): string
+        * 运行 测试
+        */
+        run(): {
+            all: number
+            pass: number
+            error: string
+        }
     }
 
-    export interface TestResult {
-        passed: boolean,
-        txt?: string
-    }
+    /**
+    * 测试模块
+    */
+    export class TestModule {
 
+        /** 测试模块名 */
+        name: string
 
-    export interface TestCase {
-        //用例标题
-        title: string,
-        //超时时间
-        overtime?: number
-        //测试用例函数
-        run: () => Promise<boolean> | boolean | Promise<string> | string,
-
-        //测试结果
-        result?: TestResult
-    }
-
-
-    export interface TestModule {
-        //用例标题
-        title: string
-        //用例数组
-        caseArray: TestCase[]
-    }
-
-
-    var exp: TestInterface;
-
-
-    export class TestInterface {
-
-        //测试用例数组
-        caseArray: TestModule[]
+        /** 测试参数数组 */
+        testUnitArray: TestUnit<any, any>[]
 
         /**
-         * 添加测试用例
-         * @param testModule
+         * 添加测试单元
+         * @param testUnit
          */
-        push(testModule: TestModule)
+        add(testUnit: TestUnit<any, any>): void
+
+        /**
+       * 运行 测试
+       */
+        run(): {
+            all: number
+            pass: number
+            error: string
+        }
+    }
+
+
+    var exp: Test;
+    /**
+     * 对外接口
+     */
+    export class Test {
+
+        /**
+       * 添加测试模块
+       * @param testModule 模块名称
+       */
+        add(testModule: TestModule): void
 
         /**
          * 运行所有测试用例
@@ -75,27 +96,11 @@
         run(): Promise<any>
 
         /**
-         * 单个测试是否通过
-         * @param testCase
-         */
-        test(testCase: TestCase): Promise<TestResult>
-
-        /**
-         * 超时方法
-         * @param fun
-         * @param timeOut
-         */
-        overtimeFun(fun: Function, timeOut: number): Promise<boolean | string>
-        /**
          * 生成文档
          * @param path
          */
         creatDoc(path?: string)
 
-    }
-
-    export let Test: {
-        new (): TestInterface;
     }
 
     export default exp;
