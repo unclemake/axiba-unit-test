@@ -1,6 +1,6 @@
 {
     "name": "axiba-unit-test",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "",
     "main": "src/index.js",
     "devDependencies": {
@@ -9,10 +9,11 @@
         "gulp-typescript": "^2.13.6"
     },
     "dependencies": {
-        "axiba-util": "^1.0.10"
+        "axiba-util": "^1.1.2"
     },
     "scripts": {
-        "test": "test"
+        "test": "node test",
+         "build": "gulp"
     },
     "repository": {
         "type": "git",

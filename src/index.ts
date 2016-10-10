@@ -1,12 +1,11 @@
-﻿/// <reference path="../node_modules/axiba-util/src/index.ts" />
-import * as fs from 'fs';
+﻿import * as fs from 'fs';
 import { Util } from 'axiba-util';
 import * as readline from 'readline';
 import * as chalk from 'chalk';
-import { TestM } from 'axiba-unit-test';
-export { TestM };
+
 
 let util = new Util();
+
 
 
 export class TestCaseList {
@@ -61,143 +60,23 @@ export class TestCaseList {
 
 
 
-
-export class Test {
-
-    //测试用例数组
-    caseModuleArray: TestModule[] = []
-
-    /**
-     * 添加测试用例
-     * @param testModule
-     */
-    add(title: string, caseArray: TestCase[] = []) {
-        let testModule = this.caseModuleArray.find(value => value.title == title);
-
-        if (testModule) {
-            testModule.caseArray = testModule.caseArray.concat(caseArray);
-        } else {
-            testModule = {
-                title: title, caseArray: caseArray
-            };
-            this.caseModuleArray.push(testModule);
-        }
-
-        return (title: string, testFunCase?: (...arg) => any, overtime?: number) => {
-            let listClass = new TestCaseList((value) => {
-                if (testFunCase) {
-                    return testFunCase(value);
-                } else {
-                    return null;
-                }
-            });
-
-            testModule.caseArray.push({
-                title: title,
-                overtime: overtime,
-                run: () => listClass.run()
-            });
-
-            return listClass;
-        };
-    }
-
-    /**
-     * 运行所有测试用例
-     */
-    async run() {
-        try {
-            for (let value of this.caseModuleArray) {
-                let passNu = 0, failNu = 0;
-                util.log(value.title);
-
-                const rl = readline.createInterface({
-                    input: process.stdin,
-                    output: process.stdout
-                });
-
-                for (let i in value.caseArray) {
-                    let testCase = value.caseArray[i];
-                    let result = await this.test(testCase);
-                    testCase.result = result;
-                    result.passed ? passNu++ : failNu++;
-
-                    rl.write(null, { ctrl: true, name: 'u' });
-
-
-                    let logStr = '总数:' + value.caseArray.length + ' 通过:' + passNu.toString() + " 未通过:" + failNu.toString() + '';
-                    if (parseInt(i) === value.caseArray.length - 1) {
-                        util.log(logStr);
-                    } else {
-                        rl.write(logStr);
-                    }
-                }
-                rl.close();
-                util.log(' ');
-                util.log(' ');
-                util.log(' ');
-                for (let testCase of value.caseArray) {
-                    if (!testCase.result.passed) {
-                        util.error(testCase.title);
-                        util.log(testCase.result.txt)
-                        util.log('');
-                    }
-                }
-
-            }
-
-        } catch (e) {
-            console.log(e);
-        }
-
-    }
-
-
-
-    /**
-     * 单个测试是否通过
-     * @param testCase
-     */
-    async test(testCase: TestCase): Promise<TestResult> {
-        let bl = await this.overtimeFun(() => {
-            try {
-                return testCase.run();
-            } catch (e) {
-                return e;
-            }
-        }, testCase.overtime);
-
-        if (typeof bl == 'boolean') {
-            if (bl) {
-                return { passed: true, txt: '成功' }
-            } else {
-                return { passed: false, txt: '失败' }
-            }
-        } else if (typeof bl == 'string') {
-            if (bl === '') {
-                return { passed: true, txt: '成功' }
-            } else {
-                return { passed: false, txt: String(bl) }
-            }
-        } else {
-            return { passed: false, txt: String(bl) }
-        }
-
-    }
-
-
-
-    /**
-     * 生成文档
-     * @param path
-     */
-    creatDoc(path: string = './testdoc.txt') {
-        util.createLogFile(path);
-    }
-
+/**
+* 单个测试
+*/
+export interface TestM<Y> {
+    argument: Y,
+    comparisonFunction: ComparisonFunction
+    overtime?: number
+    pass?: boolean,
+    error?: string
 }
 
 
+
+
+export interface ComparisonFunction{
+    (arg): string | boolean | Promise<string> | Promise<boolean> | Promise<void> | void
+}
 
 /**
  * 测试单元类 T 测试方法体 Y 参数 Z 返回值
@@ -232,7 +111,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
      * @param comparisonFunction 测试函数返回值 比对函数
      * @param overtime 超时时间
      */
-    add(argument: Y, comparisonFunction: (arg) => string | boolean | Promise<string> | Promise<boolean>, overtime: number = this.overtime) {
+    add(argument: Y, comparisonFunction:ComparisonFunction  , overtime: number = this.overtime) {
 
         this.testList.push({ argument, comparisonFunction, overtime });
         return this;
@@ -281,7 +160,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
                 clearTimeout(st);
 
                 if (typeof val == 'boolean') {
-                    error = val ? '' : '判断函数false,result:' + JSON.stringify(rValue);
+                    error = val ? '' : '判断函数出错,返回值:' + JSON.stringify(rValue);
                 } else if (typeof val == 'string') {
                     error = val
                 }
@@ -330,8 +209,18 @@ export class TestModule {
     /** 测试模块名 */
     name: string
 
+
+    /**
+  * 构造函数
+  * @param testFun 测试方法
+  */
+    constructor(name: string) {
+        this.name = name;
+    }
+
+
     /** 测试参数数组 */
-    testUnitArray: TestUnit<any, any>[]
+    testUnitArray: TestUnit<any, any>[] = []
 
     /**
      * 添加测试单元
@@ -344,51 +233,55 @@ export class TestModule {
     /**
    * 运行 测试
    */
-    async run(): {
+    async run(): Promise<{
         all: number
         pass: number
         error: string
-    } {
-        let [all, pass, error] = [0, 0, 0];
-
-        util.log('当前运行模块：' + this.name);
-
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
+        resultArray: {
+            all: number
+            pass: number
+            error: string
+        }[]
+    }> {
+        let [all, pass, fail, resultArray] = [0, 0, 0, []];
+        let error = chalk.red(`\n----错误----\n`);
+        util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' ---->\n'));
 
         for (let i in this.testUnitArray) {
-            rl.write(null, { ctrl: true, name: 'u' });
             all++;
-
             let value = this.testUnitArray[i];
+
+            util.write(`${chalk.gray('？')} ${value.name}`);
+
             let obj = await value.run();
+            resultArray.push(obj);
 
             if (obj.all == obj.pass) {
+                util.write(`${chalk.green('√')} ${value.name}\n`);
                 pass++;
             } else {
-                error++;
+                util.write(`${chalk.red('×')} ${value.name}\n`);
+                fail++;
+                error += chalk.yellow(value.name + '\n');
+                error += obj.error;
             }
-
-            let tpl = `全部:${all}  通过:${pass} 未通过:${error}  剩余:${all - pass - error}
-                       正在运行：${value.name}`;
-
-            rl.write(tpl);
 
         }
 
-        rl.close();
 
-        util.log('模块' + this.name + '测试完毕');
+        let log = `\n全部:${all}  通过:${chalk.green(pass.toString())} 未通过: ${chalk.red(fail.toString())}`;
+        util.log(log);
+
+
+        if (all - pass !== 0) {
+            error += chalk.red(`----错误----\n`);
+            util.log(error);
+        }
+        util.log(`${chalk.yellow('<----')} 模块：${chalk.green(this.name)} 测试完毕`);
 
         return {
-
+            all, pass, error, resultArray
         }
     }
 }
-
-
-
-export default new Test();
 

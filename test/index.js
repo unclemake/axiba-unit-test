@@ -16,31 +16,57 @@ const test = require('../src/index');
             .add([1, 2], (arg) => false)
             .add([1, 2], (arg) => true)
             .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
-            //await new Promise(() => {
-            //});
+            return yield new Promise(() => {
+            });
         }))
             .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
             let pl = yield (() => 1);
             throw '出错了';
         }));
-        console.log('*****单元测试');
         let result = yield testUnit.run();
-        console.log('all:' + result.all);
-        console.log('pass:' + result.pass);
-        console.log('error:\n\r' + result.error);
-        console.log('*****单元测试');
-        console.log('');
-        console.log('');
+        let log = `*****单元测试
+all:${result.all}
+pass:${result.pass}
+error:
+${result.error}
+*****单元测试
+
+
+`;
+        console.log(log);
         let testUnit2 = new test.TestUnit('单元测试2,TestUnit', (a, b) => a + b);
         testUnit2.add([1, 2], (arg) => arg === 3);
-        console.log('*****单元测试2');
         result = yield testUnit2.run();
-        console.log('all:' + result.all);
-        console.log('pass:' + result.pass);
-        console.log('error:\n\r' + result.error);
-        console.log('*****单元测试2');
-        console.log('');
-        console.log('');
+        log = `*****单元测试2
+all:${result.all}
+pass:${result.pass}
+error:
+${result.error}
+*****单元测试2
+
+
+`;
+        console.log(log);
+        let testUnit3 = new test.TestUnit('单元测试3');
+        testUnit.add([1, 2], (arg) => arg === 1);
+        let testUnit4 = new test.TestUnit('单元测试4');
+        testUnit4.add([1, 2], (arg) => arg === 1)
+            .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
+            yield new Promise(() => {
+            });
+        }))
+            .add([1, 2], (arg) => {
+            throw '报错';
+        });
+        let testUnit5 = new test.TestUnit('单元测试5', (a, b) => a * b);
+        testUnit5.add([1, 2], (arg) => arg === 2)
+            .add([3, 1], (arg) => arg === 3)
+            .add([3, 1], (arg) => arg === 6);
+        let testModule1 = new test.TestModule('模块1');
+        testModule1.add(testUnit3);
+        testModule1.add(testUnit4);
+        testModule1.add(testUnit5);
+        testModule1.run();
     });
 })();
 //let test1Add = test.default.add('TestCaseList测试模块');
