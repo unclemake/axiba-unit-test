@@ -13,12 +13,12 @@ let util = new axiba_util_1.Util();
 class TestCaseList {
     /**
      * 构造函数
-     * @param testFun 测试方法
+     * @param testFunction 测试方法
      */
-    constructor(testFun) {
+    constructor(testFunction) {
         /** 测试列表*/
         this.testList = [];
-        this.testFun = testFun;
+        this.testFunction = testFunction;
     }
     /**
      * 添加测试数据
@@ -40,7 +40,7 @@ class TestCaseList {
                 let value = this.testList[i];
                 let noNumber = parseInt(i) + 1;
                 try {
-                    let str = yield this.testFun(...value.arg);
+                    let str = yield this.testFunction(...value.arg);
                     value.run(str) || (errorStr += noNumber + ': ' + str + '\n\r');
                 }
                 catch (e) {
@@ -59,15 +59,15 @@ class TestUnit {
     /**
      * 构造函数
      * @param name 单元名
-     * @param testFunction 单元函数
+     * @param testFunctionction 单元函数
      */
-    constructor(name, testFunction = (arg => arg)) {
+    constructor(name, testFunctionction = (arg => arg)) {
         /** 默认超时 */
         this.overtime = 3000;
         /** 测试参数数组 */
         this.testList = [];
         this.name = name;
-        this.testFunction = testFunction;
+        this.testFunctionction = testFunctionction;
     }
     /**
      * 添加测试
@@ -97,7 +97,7 @@ class TestUnit {
                 }
                 let rValue;
                 let time = yield util.performanceTest(() => __awaiter(this, void 0, void 0, function* () {
-                    rValue = yield this.testFunction(...argument);
+                    rValue = yield this.testFunctionction(...argument);
                     return;
                 }));
                 if (time > overtime) {
@@ -117,7 +117,7 @@ class TestUnit {
                 }
                 clearTimeout(st);
                 if (typeof val == 'boolean') {
-                    error = val ? '' : '判断函数出错,返回值:' + JSON.stringify(rValue);
+                    error = val ? '' : '判断错误,返回值:' + JSON.stringify(rValue);
                 }
                 else if (typeof val == 'string') {
                     error = val;
@@ -159,7 +159,7 @@ exports.TestUnit = TestUnit;
 class TestModule {
     /**
   * 构造函数
-  * @param testFun 测试方法
+  * @param testFunction 测试方法
   */
     constructor(name) {
         /** 测试参数数组 */
@@ -180,7 +180,7 @@ class TestModule {
         return __awaiter(this, void 0, Promise, function* () {
             let [all, pass, fail, resultArray] = [0, 0, 0, []];
             let error = chalk.red(`\n----错误----\n`);
-            util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' ---->\n'));
+            util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' \n'));
             for (let i in this.testUnitArray) {
                 all++;
                 let value = this.testUnitArray[i];
@@ -204,7 +204,7 @@ class TestModule {
                 error += chalk.red(`----错误----\n`);
                 util.log(error);
             }
-            util.log(`${chalk.yellow('<----')} 模块：${chalk.green(this.name)} 测试完毕`);
+            util.log(`${chalk.yellow('______________________________ ')} \n`);
             return {
                 all: all, pass: pass, error: error, resultArray: resultArray
             };
@@ -212,3 +212,68 @@ class TestModule {
     }
 }
 exports.TestModule = TestModule;
+/** 无泛型单元测试 */
+class TestUnitEasy extends TestUnit {
+}
+/** 记录单元测试模块 */
+let testModule;
+/** 记录单元测试模块组 */
+let testModuleList = [];
+/** 创建单元测试模块 */
+function describe(name, cb) {
+    return __awaiter(this, void 0, void 0, function* () {
+        testModule = new TestModule(name);
+        cb();
+        testModuleList.push(testModule);
+    });
+}
+exports.describe = describe;
+/** 创建单元测试 */
+function it(name, cb) {
+    testModule.add(new TestUnitEasy(name).add([0], (arg) => cb()));
+    cb();
+}
+exports.it = it;
+/** 创建多参数单元测试 */
+function its(name, testFunction, cb) {
+    let testUnit = new TestUnitEasy(name, testFunction);
+    testModule.add(testUnit);
+    exports.itAdd = testUnit.add.bind(testUnit);
+    cb();
+}
+exports.its = its;
+/** 运行测试用例  */
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (let key in testModuleList) {
+            let element = testModuleList[key];
+            yield element.run();
+        }
+        util.createLogFile();
+    });
+}
+exports.run = run;
+let testObj;
+function describeClass(name, testObjNow, cb) {
+    return __awaiter(this, void 0, void 0, function* () {
+        testModule = new TestModule(name);
+        testObj = testObjNow;
+        cb();
+        testModuleList.push(testModule);
+    });
+}
+exports.describeClass = describeClass;
+/** 创建多参数单元测试 */
+function itClass(name, cb) {
+    if (!testObj[name]) {
+        util.warn(`${name} key不存在`);
+        return;
+    }
+    let testUnit = new TestUnitEasy(name, testObj[name].bind(testObj));
+    testModule.add(testUnit);
+    exports.itAdd = testUnit.add.bind(testUnit);
+    cb();
+}
+exports.itClass = itClass;
+
+//# sourceMappingURL=index.js.map

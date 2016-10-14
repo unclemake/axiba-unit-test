@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const test = require('../src/index');
+const index_1 = require('../src/index');
 (function () {
     return __awaiter(this, void 0, void 0, function* () {
         let testUnit = new test.TestUnit('单元测试,TestUnit');
@@ -66,9 +67,51 @@ ${result.error}
         testModule1.add(testUnit3);
         testModule1.add(testUnit4);
         testModule1.add(testUnit5);
-        testModule1.run();
+        yield testModule1.run();
+        index_1.describe('标准测试模块', () => {
+            index_1.it('测试1', () => {
+                return true;
+            });
+            index_1.it('测试2', () => {
+                return false;
+            });
+            index_1.it('测试3', () => {
+                throw '出错';
+            });
+        });
+        index_1.describe('标准测试模块多参数', () => {
+            index_1.its('测试1', testAdd, () => {
+                index_1.itAdd([3, 1], (arg) => arg === 4);
+                index_1.itAdd([3, 1], (arg) => arg === 2);
+            });
+        });
+        index_1.describeClass('class Test', new TestClass(), () => {
+            index_1.itClass('test', () => {
+                index_1.itAdd([3, 1], (arg) => arg === 4);
+            });
+        });
+        index_1.describeClass('class Test2', new TestClass2(), () => {
+            index_1.itClass('test', () => {
+                index_1.itAdd([3, 1], (arg) => arg === 4);
+                index_1.itAdd([3, 1], (arg) => arg === 3);
+            });
+        });
+        index_1.run();
     });
 })();
+class TestClass {
+    test(a, b) {
+        return a + b;
+    }
+}
+class TestClass2 {
+    test(a, b) {
+        return a - b;
+    }
+}
+function testAdd(a, b) {
+    return a + b;
+}
 //let test1Add = test.default.add('TestCaseList测试模块');
 //function testFunCase(value) {
 //    return value + 'a';
@@ -139,3 +182,5 @@ ${result.error}
 //let testList = [testCase, testCase2, testCase3, timeOutCase1, timeOutCase2, errorCase1, stringCase1, stringCase2];
 //let testModule = test.default.push('test测试模块');
 //test.default.run().then(() => test.default.creatDoc());
+
+//# sourceMappingURL=index.js.map

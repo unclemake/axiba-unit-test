@@ -1,5 +1,7 @@
 ﻿
-import * as test from '../src/index'
+import * as test from '../src/index';
+import { describe, it, its, run, describeClass, itClass, itAdd } from '../src/index';
+
 
 (async function () {
     let testUnit = new test.TestUnit<any, [number, number]>('单元测试,TestUnit');
@@ -9,7 +11,7 @@ import * as test from '../src/index'
         .add([1, 2], (arg) => false)
         .add([1, 2], (arg) => true)
         .add([1, 2], async (arg) => {
-           return await new Promise(() => {
+            return await new Promise(() => {
 
             });
         })
@@ -77,14 +79,67 @@ ${result.error}
     testModule1.add(testUnit4);
     testModule1.add(testUnit5);
 
-    testModule1.run();
+    await testModule1.run();
 
 
 
+    describe('标准测试模块', () => {
+        it('测试1', () => {
+            return true;
+        })
+
+        it('测试2', () => {
+            return false;
+        })
+
+        it('测试3', () => {
+            throw '出错';
+        })
+    })
+
+    describe('标准测试模块多参数', () => {
+        its('测试1', testAdd, () => {
+            itAdd([3, 1], (arg) => arg === 4);
+            itAdd([3, 1], (arg) => arg === 2);
+        });
+    })
+
+
+    describeClass('class Test', new TestClass(), () => {
+        itClass('test', () => {
+            itAdd([3, 1], (arg) => arg === 4);
+        })
+    })
+
+
+    describeClass('class Test2', new TestClass2(), () => {
+        itClass('test', () => {
+            itAdd([3, 1], (arg) => arg === 4);
+            itAdd([3, 1], (arg) => arg === 3);
+        })
+    })
+
+    run();
 })()
 
+class TestClass {
+    test(a, b) {
+        return a + b;
+    }
+
+}
+
+class TestClass2 {
+    test(a, b) {
+        return a - b;
+    }
+
+}
 
 
+function testAdd(a, b) {
+    return a + b;
+}
 
 
 
@@ -177,4 +232,3 @@ ${result.error}
 //let testModule = test.default.push('test测试模块');
 
 //test.default.run().then(() => test.default.creatDoc());
-

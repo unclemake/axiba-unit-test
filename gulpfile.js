@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var gulpTypescript = require('gulp-typescript');
 var jsdoc = require("gulp-jsdoc3");
+const sourcemaps = require('gulp-sourcemaps');;
 
 gulp.task('default', function () {
 
@@ -19,7 +20,9 @@ gulp.task('default', function () {
             .src(pathArr, {
                 base: './'
             })
-                       .pipe(gulpTypescript(tsconfig))
+            .pipe(sourcemaps.init())
+            .pipe(gulpTypescript(tsconfig))
+            .pipe(sourcemaps.write('./', {includeContent: false, sourceRoot: './'}))
             .pipe(gulp.dest('./'));
     }
 });

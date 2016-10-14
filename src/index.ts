@@ -3,7 +3,6 @@ import { Util } from 'axiba-util';
 import * as readline from 'readline';
 import * as chalk from 'chalk';
 
-
 let util = new Util();
 
 
@@ -11,7 +10,7 @@ let util = new Util();
 export class TestCaseList {
 
     /** 测试方法*/
-    private testFun: (...arg) => any
+    private testFunction: (...arg) => any
 
     /** 测试列表*/
     private testList: {
@@ -19,10 +18,10 @@ export class TestCaseList {
     }[] = []
     /**
      * 构造函数
-     * @param testFun 测试方法
+     * @param testFunction 测试方法
      */
-    constructor(testFun: (...arg) => any) {
-        this.testFun = testFun;
+    constructor(testFunction: (...arg) => any) {
+        this.testFunction = testFunction;
     }
 
     /**
@@ -47,7 +46,7 @@ export class TestCaseList {
 
             let noNumber = parseInt(i) + 1;
             try {
-                let str = await this.testFun(...value.arg);
+                let str = await this.testFunction(...value.arg);
                 value.run(str) || (errorStr += noNumber + ': ' + str + '\n\r');
             } catch (e) {
                 errorStr += noNumber + ': ' + e + '\n\r';
@@ -74,7 +73,7 @@ export interface TestM<Y> {
 
 
 
-export interface ComparisonFunction{
+export interface ComparisonFunction {
     (arg): string | boolean | Promise<string> | Promise<boolean> | Promise<void> | void
 }
 
@@ -86,11 +85,11 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
     /**
      * 构造函数
      * @param name 单元名
-     * @param testFunction 单元函数
+     * @param testFunctionction 单元函数
      */
-    constructor(name: string, testFunction: T = (arg => arg) as any) {
+    constructor(name: string, testFunctionction: T = (arg => arg) as any) {
         this.name = name;
-        this.testFunction = testFunction;
+        this.testFunctionction = testFunctionction;
     }
 
     /** 测试单元名 */
@@ -100,7 +99,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
     overtime = 3000;
 
     /** 测试函数 */
-    private testFunction: T
+    private testFunctionction: T
 
     /** 测试参数数组 */
     private testList: TestM<Y>[] = []
@@ -111,7 +110,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
      * @param comparisonFunction 测试函数返回值 比对函数
      * @param overtime 超时时间
      */
-    add(argument: Y, comparisonFunction:ComparisonFunction  , overtime: number = this.overtime) {
+    add(argument: Y, comparisonFunction: ComparisonFunction, overtime: number = this.overtime) {
 
         this.testList.push({ argument, comparisonFunction, overtime });
         return this;
@@ -137,7 +136,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
 
                 let rValue;
                 let time = await util.performanceTest(async () => {
-                    rValue = await this.testFunction(...argument);
+                    rValue = await this.testFunctionction(...argument);
                     return;
                 });
 
@@ -160,7 +159,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
                 clearTimeout(st);
 
                 if (typeof val == 'boolean') {
-                    error = val ? '' : '判断函数出错,返回值:' + JSON.stringify(rValue);
+                    error = val ? '' : '判断错误,返回值:' + JSON.stringify(rValue);
                 } else if (typeof val == 'string') {
                     error = val
                 }
@@ -212,7 +211,7 @@ export class TestModule {
 
     /**
   * 构造函数
-  * @param testFun 测试方法
+  * @param testFunction 测试方法
   */
     constructor(name: string) {
         this.name = name;
@@ -245,7 +244,7 @@ export class TestModule {
     }> {
         let [all, pass, fail, resultArray] = [0, 0, 0, []];
         let error = chalk.red(`\n----错误----\n`);
-        util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' ---->\n'));
+        util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' \n'));
 
         for (let i in this.testUnitArray) {
             all++;
@@ -277,11 +276,80 @@ export class TestModule {
             error += chalk.red(`----错误----\n`);
             util.log(error);
         }
-        util.log(`${chalk.yellow('<----')} 模块：${chalk.green(this.name)} 测试完毕`);
+        util.log(`${chalk.yellow('______________________________ ')} \n`);
 
         return {
             all, pass, error, resultArray
         }
     }
 }
+
+
+/** 无泛型单元测试 */
+class TestUnitEasy extends TestUnit<any, any>{ }
+
+
+/** 记录单元测试模块 */
+let testModule: TestModule;
+/** 记录单元测试模块组 */
+let testModuleList: TestModule[] = [];
+/** 创建单元测试模块 */
+export async function describe(name: string, cb: Function) {
+    testModule = new TestModule(name);
+    cb();
+    testModuleList.push(testModule);
+}
+
+/** 创建单元测试 */
+export function it(name: string, cb: Function) {
+    testModule.add(new TestUnitEasy(name).add([0], (arg) => cb()));
+    cb();
+}
+
+/** 创建多参数单元测试 */
+export function its(name: string, testFunction: Function, cb: () => void) {
+    let testUnit = new TestUnitEasy(name, testFunction);
+    testModule.add(testUnit);
+    itAdd = testUnit.add.bind(testUnit);
+    cb();
+}
+
+/** 运行测试用例  */
+export async function run() {
+    for (let key in testModuleList) {
+        let element = testModuleList[key];
+        await element.run();
+    }
+
+    util.createLogFile();
+}
+
+
+let testObj;
+export async function describeClass(name: string, testObjNow: any, cb: Function) {
+    testModule = new TestModule(name);
+    testObj = testObjNow;
+    cb();
+    testModuleList.push(testModule);
+}
+
+
+/** 创建多参数单元测试 */
+export function itClass(name: string, cb: () => void) {
+
+    if (!testObj[name]) { 
+        util.warn(`${name} key不存在`);
+        return;
+    }
+
+    let testUnit = new TestUnitEasy(name, testObj[name].bind(testObj));
+    testModule.add(testUnit);
+    itAdd = testUnit.add.bind(testUnit);
+    cb();
+}
+
+
+/** 添加多参数 */
+export let itAdd;
+
 
