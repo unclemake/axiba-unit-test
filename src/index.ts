@@ -337,7 +337,7 @@ export async function describeClass(name: string, testObjNow: any, cb: Function)
 /** 创建多参数单元测试 */
 export function itClass(name: string, cb: () => void) {
 
-    if (!testObj[name]) { 
+    if (!testObj[name]) {
         util.warn(`${name} key不存在`);
         return;
     }
@@ -350,6 +350,6 @@ export function itClass(name: string, cb: () => void) {
 
 
 /** 添加多参数 */
-export let itAdd;
+export let itAdd: (argument: any[], comparisonFunction: ComparisonFunction, overtime: number) => void;
 
 
