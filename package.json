@@ -1,6 +1,6 @@
 {
   "name": "axiba-unit-test",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "",
   "main": "src/index.js",
   "devDependencies": {
@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "node test",
-    "build": "gulp"
+    "build": "gulp",
+    "cnpm": "npm install --registry=https://registry.npm.taobao.org"
   },
   "repository": {
     "type": "git",

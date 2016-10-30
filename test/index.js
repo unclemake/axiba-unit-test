@@ -7,98 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-const test = require('../src/index');
 const index_1 = require('../src/index');
-(function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        let testUnit = new test.TestUnit('单元测试,TestUnit');
-        testUnit.add([1, 2], (arg) => arg === 3)
-            .add([1, 2], (arg) => arg === 1)
-            .add([1, 2], (arg) => false)
-            .add([1, 2], (arg) => true)
-            .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
-            return yield new Promise(() => {
-            });
-        }))
-            .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
-            let pl = yield (() => 1);
-            throw '出错了';
-        }));
-        let result = yield testUnit.run();
-        let log = `*****单元测试
-all:${result.all}
-pass:${result.pass}
-error:
-${result.error}
-*****单元测试
-
-
-`;
-        console.log(log);
-        let testUnit2 = new test.TestUnit('单元测试2,TestUnit', (a, b) => a + b);
-        testUnit2.add([1, 2], (arg) => arg === 3);
-        result = yield testUnit2.run();
-        log = `*****单元测试2
-all:${result.all}
-pass:${result.pass}
-error:
-${result.error}
-*****单元测试2
-
-
-`;
-        console.log(log);
-        let testUnit3 = new test.TestUnit('单元测试3');
-        testUnit.add([1, 2], (arg) => arg === 1);
-        let testUnit4 = new test.TestUnit('单元测试4');
-        testUnit4.add([1, 2], (arg) => arg === 1)
-            .add([1, 2], (arg) => __awaiter(this, void 0, void 0, function* () {
-            yield new Promise(() => {
-            });
-        }))
-            .add([1, 2], (arg) => {
-            throw '报错';
-        });
-        let testUnit5 = new test.TestUnit('单元测试5', (a, b) => a * b);
-        testUnit5.add([1, 2], (arg) => arg === 2)
-            .add([3, 1], (arg) => arg === 3)
-            .add([3, 1], (arg) => arg === 6);
-        let testModule1 = new test.TestModule('模块1');
-        testModule1.add(testUnit3);
-        testModule1.add(testUnit4);
-        testModule1.add(testUnit5);
-        yield testModule1.run();
-        index_1.describe('标准测试模块', () => {
-            index_1.it('测试1', () => {
-                return true;
-            });
-            index_1.it('测试2', () => {
-                return false;
-            });
-            index_1.it('测试3', () => {
-                throw '出错';
-            });
-        });
-        index_1.describe('标准测试模块多参数', () => {
-            index_1.its('测试1', testAdd, () => {
-                index_1.itAdd([3, 1], (arg) => arg === 4);
-                index_1.itAdd([3, 1], (arg) => arg === 2);
-            });
-        });
-        index_1.describeClass('class Test', new TestClass(), () => {
-            index_1.itClass('test', () => {
-                index_1.itAdd([3, 1], (arg) => arg === 4);
-            });
-        });
-        index_1.describeClass('class Test2', new TestClass2(), () => {
-            index_1.itClass('test', () => {
-                index_1.itAdd([3, 1], (arg) => arg === 4);
-                index_1.itAdd([3, 1], (arg) => arg === 3);
-            });
-        });
-        index_1.run();
-    });
-})();
 class TestClass {
     test(a, b) {
         return a + b;
@@ -109,9 +18,105 @@ class TestClass2 {
         return a - b;
     }
 }
+class TestClass3 {
+    test(a, b) {
+        throw '2';
+    }
+}
 function testAdd(a, b) {
     return a + b;
 }
+(function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        //     let testUnit = new test.TestUnit<any, [number, number]>('单元测试,TestUnit');
+        //     testUnit.add([1, 2], (arg) => arg === 3)
+        //         .add([1, 2], (arg) => arg === 1)
+        //         .add([1, 2], (arg) => false)
+        //         .add([1, 2], (arg) => true)
+        //         .add([1, 2], async (arg) => {
+        //             return await new Promise(() => {
+        //             });
+        //         })
+        //         .add([1, 2], async (arg) => {
+        //             let pl = await (() => 1);
+        //             throw '出错了';
+        //         });
+        //     let result = await testUnit.run();
+        //     let log = `*****单元测试
+        // all:${result.all}
+        // pass:${result.pass}
+        // error:
+        // ${result.error}
+        // *****单元测试
+        // `;
+        //     console.log(log);
+        //     let testUnit2 = new test.TestUnit<(a, b) => number, [number, number]>('单元测试2,TestUnit', (a, b) => a + b);
+        //     testUnit2.add([1, 2], (arg) => arg === 3)
+        //     result = await testUnit2.run();
+        //     log = `*****单元测试2
+        // all:${result.all}
+        // pass:${result.pass}
+        // error:
+        // ${result.error}
+        // *****单元测试2
+        // `;
+        //     console.log(log);
+        //     let testUnit3 = new test.TestUnit<any, any>('单元测试3')
+        //     testUnit.add([1, 2], (arg) => arg === 1);
+        //     let testUnit4 = new test.TestUnit<any, any>('单元测试4')
+        //     testUnit4.add([1, 2], (arg) => arg === 1)
+        //         .add([1, 2], async (arg) => {
+        //             await new Promise(() => {
+        //             });
+        //         })
+        //         .add([1, 2], (arg) => {
+        //             throw '报错';
+        //         });
+        //     let testUnit5 = new test.TestUnit<(a, b) => number, any>('单元测试5', (a, b) => a * b)
+        //     testUnit5.add([1, 2], (arg) => arg === 2)
+        //         .add([3, 1], (arg) => arg === 3)
+        //         .add([3, 1], (arg) => arg === 6)
+        //     let testModule1 = new test.TestModule('模块1')
+        //     testModule1.add(testUnit3);
+        //     testModule1.add(testUnit4);
+        //     testModule1.add(testUnit5);
+        //     await testModule1.run();
+        //     describe('标准测试模块', () => {
+        //         it('测试1', () => {
+        //             return true;
+        //         })
+        //         it('测试2', () => {
+        //             return false;
+        //         })
+        //         it('测试3', () => {
+        //             throw '出错';
+        //         })
+        //     })
+        //     describe('标准测试模块多参数', () => {
+        //         its('测试1', testAdd, () => {
+        //             itAdd([3, 1], (arg) => arg === 4);
+        //             itAdd([3, 1], (arg) => arg === 2);
+        //         });
+        //     })
+        //     describeClass('class Test', new TestClass(), () => {
+        //         itClass('test', () => {
+        //             itAdd([3, 1], (arg) => arg === 4);
+        //         })
+        //     })
+        // describeClass('class Test2', new TestClass2(), () => {
+        //     itClass('test', () => {
+        //         itAdd([3, 1], (arg) => arg === 2);
+        //         itAdd([4, 1], (arg) => arg === 3, 999999);
+        //     })
+        // })
+        index_1.describeClass('class Test2', new TestClass3(), () => {
+            index_1.itClass('test', () => {
+                index_1.itAdd([4, 1], (arg) => arg === 3, 999999);
+            });
+        });
+        index_1.run();
+    });
+})();
 //let test1Add = test.default.add('TestCaseList测试模块');
 //function testFunCase(value) {
 //    return value + 'a';

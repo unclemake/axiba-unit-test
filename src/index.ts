@@ -136,7 +136,12 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
 
                 let rValue;
                 let time = await util.performanceTest(async () => {
-                    rValue = await this.testFunctionction(...argument);
+                    try {
+                        rValue = await this.testFunctionction(...argument);
+                    } catch (error) {
+                        clearTimeout(st);
+                        resolve(error);
+                    }
                     return;
                 });
 
@@ -350,6 +355,6 @@ export function itClass(name: string, cb: () => void) {
 
 
 /** 添加多参数 */
-export let itAdd: (argument: any[], comparisonFunction: ComparisonFunction, overtime: number) => void;
+export let itAdd: (argument: any[], comparisonFunction: ComparisonFunction, overtime?: number) => void;
 
 

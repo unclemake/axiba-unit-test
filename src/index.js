@@ -97,7 +97,13 @@ class TestUnit {
                 }
                 let rValue;
                 let time = yield util.performanceTest(() => __awaiter(this, void 0, void 0, function* () {
-                    rValue = yield this.testFunctionction(...argument);
+                    try {
+                        rValue = yield this.testFunctionction(...argument);
+                    }
+                    catch (error) {
+                        clearTimeout(st);
+                        resolve(error);
+                    }
                     return;
                 }));
                 if (time > overtime) {
