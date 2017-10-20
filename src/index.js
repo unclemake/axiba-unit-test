@@ -270,12 +270,12 @@ function describeClass(name, testObjNow, cb) {
 }
 exports.describeClass = describeClass;
 /** 创建多参数单元测试 */
-function itClass(name, cb) {
+function itClass(name, cb, nameAs) {
     if (!testObj[name]) {
         util.warn(`${name} key不存在`);
         return;
     }
-    let testUnit = new TestUnitEasy(name, testObj[name].bind(testObj));
+    let testUnit = new TestUnitEasy(nameAs || name, testObj[name].bind(testObj));
     testModule.add(testUnit);
     exports.itAdd = testUnit.add.bind(testUnit);
     cb();

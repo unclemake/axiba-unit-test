@@ -124,7 +124,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
     testOne(testM: TestM<Y>): Promise<string> {
         return new Promise(async (resolve, reject) => {
             let error = '';
-            let {argument, comparisonFunction, overtime} = testM;
+            let { argument, comparisonFunction, overtime } = testM;
             try {
                 //函数卡死的跳出
                 let st;
@@ -340,14 +340,14 @@ export async function describeClass(name: string, testObjNow: any, cb: Function)
 
 
 /** 创建多参数单元测试 */
-export function itClass(name: string, cb: () => void) {
+export function itClass(name: string, cb: () => void, nameAs?: string) {
 
     if (!testObj[name]) {
         util.warn(`${name} key不存在`);
         return;
     }
 
-    let testUnit = new TestUnitEasy(name, testObj[name].bind(testObj));
+    let testUnit = new TestUnitEasy(nameAs || name, testObj[name].bind(testObj));
     testModule.add(testUnit);
     itAdd = testUnit.add.bind(testUnit);
     cb();
