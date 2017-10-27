@@ -1,10 +1,4 @@
 ﻿import * as fs from 'fs';
-import { Util } from 'axiba-util';
-import * as readline from 'readline';
-import * as chalk from 'chalk';
-
-let util = new Util();
-
 
 
 export class TestCaseList {
@@ -23,6 +17,8 @@ export class TestCaseList {
     constructor(testFunction: (...arg) => any) {
         this.testFunction = testFunction;
     }
+
+
 
     /**
      * 添加测试数据
@@ -116,6 +112,19 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
         return this;
     }
 
+    /**
+     * 测速
+     * 
+     * @param {() => any} fun 
+     * @returns {Promise<number>} 
+     * @memberof TestUnit
+     */
+    async performanceTest(fun: () => any): Promise<number> {
+        let start = new Date().getTime();//起始时间
+        await fun();
+        var end = new Date().getTime();//接受时间
+        return end - start;
+    };
 
     /**
      * 单个测试测试
@@ -135,7 +144,7 @@ export class TestUnit<T extends Function, Y extends Array<any>> {
                 }
 
                 let rValue;
-                let time = await util.performanceTest(async () => {
+                let time = await this.performanceTest(async () => {
                     try {
                         rValue = await this.testFunctionction(...argument);
                     } catch (error) {
@@ -248,40 +257,40 @@ export class TestModule {
         }[]
     }> {
         let [all, pass, fail, resultArray] = [0, 0, 0, []];
-        let error = chalk.red(`\n----错误----\n`);
-        util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' \n'));
+        let error = `\n----错误----\n`;
+        util.log('运行模块：' + this.name);
 
         for (let i in this.testUnitArray) {
             all++;
             let value = this.testUnitArray[i];
 
-            util.write(`${chalk.gray('？')} ${value.name}`);
+            // util.warn(`？ ${value.name}`);
 
             let obj = await value.run();
             resultArray.push(obj);
 
             if (obj.all == obj.pass) {
-                util.write(`${chalk.green('√')} ${value.name}\n`);
+                util.log(`√ ${value.name}`);
                 pass++;
             } else {
-                util.write(`${chalk.red('×')} ${value.name}\n`);
+                util.error(`× ${value.name}`);
                 fail++;
-                error += chalk.yellow(value.name + '\n');
+                error += value.name + '\n';
                 error += obj.error;
             }
 
         }
 
 
-        let log = `\n全部:${all}  通过:${chalk.green(pass.toString())} 未通过: ${chalk.red(fail.toString())}`;
+        let log = `\n全部:${all}  通过:${pass} 未通过: ${fail}`;
         util.log(log);
 
 
         if (all - pass !== 0) {
-            error += chalk.red(`----错误----\n`);
-            util.log(error);
+            error += `----错误----\n`;
+            util.error(error);
         }
-        util.log(`${chalk.yellow('______________________________ ')} \n`);
+        util.log(`______________________________  \n`);
 
         return {
             all, pass, error, resultArray
@@ -326,7 +335,7 @@ export async function run() {
         await element.run();
     }
 
-    util.createLogFile();
+    // util.createLogFile();
 }
 
 
@@ -357,4 +366,18 @@ export function itClass(name: string, cb: () => void, nameAs?: string) {
 /** 添加多参数 */
 export let itAdd: (argument: any[], comparisonFunction: ComparisonFunction, overtime?: number) => void;
 
+
+class util {
+    static warn(str: string) {
+        console.warn(str);
+    }
+
+    static log(str: string) {
+        console.log(str);
+    }
+
+    static error(str: string) {
+        console.error(str);
+    }
+}
 

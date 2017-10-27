@@ -7,9 +7,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-const axiba_util_1 = require('axiba-util');
-const chalk = require('chalk');
-let util = new axiba_util_1.Util();
 class TestCaseList {
     /**
      * 构造函数
@@ -80,6 +77,22 @@ class TestUnit {
         return this;
     }
     /**
+     * 测速
+     *
+     * @param {() => any} fun
+     * @returns {Promise<number>}
+     * @memberof TestUnit
+     */
+    performanceTest(fun) {
+        return __awaiter(this, void 0, Promise, function* () {
+            let start = new Date().getTime(); //起始时间
+            yield fun();
+            var end = new Date().getTime(); //接受时间
+            return end - start;
+        });
+    }
+    ;
+    /**
      * 单个测试测试
      * @param testM
      */
@@ -96,7 +109,7 @@ class TestUnit {
                     }, overtime);
                 }
                 let rValue;
-                let time = yield util.performanceTest(() => __awaiter(this, void 0, void 0, function* () {
+                let time = yield this.performanceTest(() => __awaiter(this, void 0, void 0, function* () {
                     try {
                         rValue = yield this.testFunctionction(...argument);
                     }
@@ -185,32 +198,32 @@ class TestModule {
     run() {
         return __awaiter(this, void 0, Promise, function* () {
             let [all, pass, fail, resultArray] = [0, 0, 0, []];
-            let error = chalk.red(`\n----错误----\n`);
-            util.log('运行模块：' + chalk.green(this.name) + chalk.yellow(' \n'));
+            let error = `\n----错误----\n`;
+            util.log('运行模块：' + this.name);
             for (let i in this.testUnitArray) {
                 all++;
                 let value = this.testUnitArray[i];
-                util.write(`${chalk.gray('？')} ${value.name}`);
+                // util.warn(`？ ${value.name}`);
                 let obj = yield value.run();
                 resultArray.push(obj);
                 if (obj.all == obj.pass) {
-                    util.write(`${chalk.green('√')} ${value.name}\n`);
+                    util.log(`√ ${value.name}`);
                     pass++;
                 }
                 else {
-                    util.write(`${chalk.red('×')} ${value.name}\n`);
+                    util.error(`× ${value.name}`);
                     fail++;
-                    error += chalk.yellow(value.name + '\n');
+                    error += value.name + '\n';
                     error += obj.error;
                 }
             }
-            let log = `\n全部:${all}  通过:${chalk.green(pass.toString())} 未通过: ${chalk.red(fail.toString())}`;
+            let log = `\n全部:${all}  通过:${pass} 未通过: ${fail}`;
             util.log(log);
             if (all - pass !== 0) {
-                error += chalk.red(`----错误----\n`);
-                util.log(error);
+                error += `----错误----\n`;
+                util.error(error);
             }
-            util.log(`${chalk.yellow('______________________________ ')} \n`);
+            util.log(`______________________________  \n`);
             return {
                 all: all, pass: pass, error: error, resultArray: resultArray
             };
@@ -255,7 +268,7 @@ function run() {
             let element = testModuleList[key];
             yield element.run();
         }
-        util.createLogFile();
+        // util.createLogFile();
     });
 }
 exports.run = run;
@@ -281,5 +294,16 @@ function itClass(name, cb, nameAs) {
     cb();
 }
 exports.itClass = itClass;
+class util {
+    static warn(str) {
+        console.warn(str);
+    }
+    static log(str) {
+        console.log(str);
+    }
+    static error(str) {
+        console.error(str);
+    }
+}
 
 //# sourceMappingURL=index.js.map
